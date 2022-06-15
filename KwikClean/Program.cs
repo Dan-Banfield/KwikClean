@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace KwikClean
 {
@@ -6,11 +7,11 @@ namespace KwikClean
     {
         static void Main()
         {
-            SetupConsole();
+            SetUpConsole();
             ShowMenu();
         }
 
-        private static void SetupConsole()
+        private static void SetUpConsole()
         {
             Console.Title = "KwikClean";
             Console.ForegroundColor = ConsoleColor.White;
@@ -27,7 +28,77 @@ namespace KwikClean
 
         private static void BeginCleanupProcess()
         {
-            // TODO: Add code to remove unwanted files.
+            DeleteUnwantedFiles();
+
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
+
+            Environment.Exit(0);
+        }
+
+        private static void DeleteUnwantedFiles()
+        {
+            Console.Write("\n");
+            DeleteTemporaryFiles();
+        }
+
+        private static void DeleteTemporaryFiles()
+        {
+            DeleteTemporaryAppDataFiles();
+            DeleteTemporaryWindowsFiles();
+
+            Console.WriteLine("All temporary files were deleted successfully.");
+
+            DeleteSoftwareDistributionFiles();
+
+            Console.WriteLine("All Windows update files were deleted successfully.");
+        }
+
+        private static void DeleteTemporaryAppDataFiles()
+        {
+            DeleteAllFilesFromDirectory(GetTemporaryAppDataDirectory());
+        }
+
+        private static void DeleteTemporaryWindowsFiles()
+        {
+            DeleteAllFilesFromDirectory(GetTemporaryWindowsDirectory());
+        }
+
+        private static void DeleteSoftwareDistributionFiles()
+        {
+            DeleteAllFilesFromDirectory(GetSoftwareDistributionDirectory());
+        }
+
+        private static void DeleteAllFilesFromDirectory(string directory)
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+
+            foreach (FileInfo file in directoryInfo.GetFiles())
+            {
+                try { file.Delete(); }
+                catch { }
+            }
+
+            foreach (DirectoryInfo dir in directoryInfo.GetDirectories())
+            {
+                try { dir.Delete(true); }
+                catch { }
+            }
+        }
+
+        private static string GetTemporaryAppDataDirectory()
+        {
+            return @"C:\Users\" + Environment.UserName + @"\AppData\Local\Temp";
+        }
+
+        private static string GetTemporaryWindowsDirectory()
+        {
+            return @"C:\Windows\Temp";
+        }
+
+        private static string GetSoftwareDistributionDirectory()
+        {
+            return @"C:\Windows\SoftwareDistribution";
         }
     }
 }
